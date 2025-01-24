@@ -92,40 +92,26 @@
 						data: { bienso },
 						dataType: "json",
 						success: function (response) {
-							if (!response || response.error) {
-								showError(response.error || "Không tìm thấy thông tin vi phạm.");
+							if (response.status !== 1 || !response.data) {
+								showError(response.msg || "Không tìm thấy thông tin vi phạm.");
 								return;
 							}
 
-							if (!Array.isArray(response) || response.length === 0) {
-								$("#results")
-									.html(
-										`
-                                <div class="bg-green-50 p-6 rounded-xl text-green-700">
-                                    Không tìm thấy thông tin vi phạm cho biển số ${bienso}.
-                                </div>
-                            `
-									)
-									.removeClass("hidden");
-								return;
-							}
-
-							// Hiển thị kết quả
-							const resultsHtml = response
+							const violationsHtml = response.data
 								.map(
-									(item, index) => `
-                            <div class="bg-white p-6 rounded-xl shadow">
-                                <h3 class="text-xl font-bold">Vi phạm ${index + 1}</h3>
-                                <p><strong>Biển số:</strong> ${item["Biển kiểm soát"]}</p>
-                                <p><strong>Thời gian:</strong> ${formatDate(item["Thời gian vi phạm"])}</p>
-                                <p><strong>Địa điểm:</strong> ${item["Địa điểm vi phạm"]}</p>
-                                <p><strong>Hành vi:</strong> ${item["Hành vi vi phạm"]}</p>
-                            </div>
-                        `
+									(violation, index) => `
+										<div class="bg-white p-6 rounded-xl shadow">
+											<h3 class="text-xl font-bold">Vi phạm ${index + 1}</h3>
+											<p><strong>Biển số:</strong> ${violation["Biển kiểm soát"]}</p>
+											<p><strong>Thời gian:</strong> ${formatDate(violation["Thời gian vi phạm"])}</p>
+											<p><strong>Địa điểm:</strong> ${violation["Địa điểm vi phạm"]}</p>
+											<p><strong>Hành vi:</strong> ${violation["Hành vi vi phạm"]}</p>
+										</div>
+									`
 								)
 								.join("");
 
-							$("#results").html(resultsHtml).removeClass("hidden");
+							$("#results").html(violationsHtml).removeClass("hidden");
 						},
 						error: function () {
 							showError("Không thể kết nối tới máy chủ.");
